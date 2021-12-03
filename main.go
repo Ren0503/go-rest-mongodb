@@ -36,8 +36,13 @@ func getPerson(c *fiber.Ctx) {
 		c.Status(500).Send(err)
 		return
 	}
-	
+
 	cur.All(context.Background(), &results)
+
+	if results == nil {
+		c.SendStatus(404)
+		return
+	}
 
 	json, _ := json.Marshal(results)
 	c.Send(json)
@@ -69,7 +74,6 @@ func updatePerson(c *fiber.Ctx) {
 		c.Status(500).Send(err)
 		return
 	}
-
 	var person Person
 	json.Unmarshal([]byte(c.Body()), &person)
 
@@ -91,6 +95,7 @@ func updatePerson(c *fiber.Ctx) {
 
 func deletePerson(c *fiber.Ctx) {
 	collection, err := getMongoDbCollection(dbName, collectionName)
+
 	if err != nil {
 		c.Status(500).Send(err)
 		return
@@ -104,8 +109,8 @@ func deletePerson(c *fiber.Ctx) {
 		return
 	}
 
-	response, _ := json.Marshal(res)
-	c.Send(response)
+	jsonResponse, _ := json.Marshal(res)
+	c.Send(jsonResponse)
 }
 
 func main() {
